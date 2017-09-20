@@ -1,6 +1,13 @@
 Node.js api gateway to the Amazon Giftcard On Demand Web service
 ============
 
+## Install
+`npm install agcod`
+
+## Configuration
+
+Create a `development.json`, `sandbox.json` and `production.json` in the config directory that looks like `example.json`.
+
 ## Usage
 ```javascript
 const Client = require('agcod')
