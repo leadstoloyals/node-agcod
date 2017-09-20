@@ -1,7 +1,7 @@
 {
-  "name": "node-agcod-client",
-  "version": "0.0.1",
-  "description": "Node.js client for the Amazon Gift Codes On Demand Web Services",
+  "name": "node-agcod",
+  "version": "1.0.0",
+  "description": "Node.js api for the Amazon Gift Codes On Demand Web Services",
   "main": "index.js",
   "engines": {
     "node": ">=4.4.5"
@@ -14,10 +14,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leadstoloyals/node-agcod-client.git"
+    "url": "git+https://github.com/leadstoloyals/node-agcod.git"
   },
   "keywords": [
-    "amazon",
+    "agcod",
+    "amazon-web-services",
     "aws",
     "giftcard",
     "loyalty"
@@ -25,9 +26,9 @@
   "author": "Christiaan Westerbeek",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/leadstoloyals/node-agcod-client/issues"
+    "url": "https://github.com/leadstoloyals/node-agcod/issues"
   },
-  "homepage": "https://github.com/leadstoloyals/node-agcod-client#readme",
+  "homepage": "https://github.com/leadstoloyals/node-agcod#readme",
   "devDependencies": {
     "cross-env": "5.0.5",
     "eslint": "^4.7.1",
