@@ -21,6 +21,15 @@ module.exports = class {
     return {req, sequentialId, requestBody, signedRequest}
   }
 
+  createGiftCardAgain(region, amount, currencyCode, sequentialId, cb) {
+    this._checkRegion(region)
+    const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode)
+    const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody)
+    const req = this._doRequest(signedRequest, cb)
+
+    return {req, sequentialId, requestBody, signedRequest}
+  }
+
   cancelGiftCard(region, sequentialId, gcId, cb) {
     this._checkRegion(region)
     const requestBody = this._getCancelGiftCardRequestBody(sequentialId, gcId)
