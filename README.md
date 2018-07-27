@@ -1,6 +1,10 @@
 Node.js api gateway to the Amazon Giftcard On Demand Web service
 ============
 
+## About this fork
+
+I added a parameter `externalReference` which allows you to push some additional informations to your Amazon AGCOD dashboard about the created gift cards.
+
 ## Install
 `npm install agcod`
 
