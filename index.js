@@ -11,10 +11,10 @@ module.exports = class {
     Object.assign(this.config, cfg)
   }
 
-  createGiftCard(region, amount, currencyCode, cb) {
+  createGiftCard(region, amount, currencyCode, externalReference, cb) {
     this._checkRegion(region)
     const sequentialId = this._getNewId()
-    const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode)
+    const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode, externalReference)
     const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody)
     const req = this._doRequest(signedRequest, cb)
 
@@ -52,10 +52,10 @@ module.exports = class {
    * Builds the request body to be POSTed for creating a gift card
    * @returns {Object}
    */
-  _getCreateGiftCardRequestBody(sequentialId, amount, currencyCode) {
+  _getCreateGiftCardRequestBody(sequentialId, amount, currencyCode, externalReference) {
     return helpers.CreateGiftCardRequest(
       this.config.partnerId,
-      sequentialId, amount, currencyCode
+      sequentialId, amount, currencyCode, externalReference
     )
   }
 
