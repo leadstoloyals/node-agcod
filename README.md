@@ -13,7 +13,7 @@ Create a `development.json`, `sandbox.json` and `production.json` in the config 
 const Client = require('agcod')
 const client = new Client()
 
-client.createGiftCard('NA', 123, 'USD', (error, result) => {
+client.createGiftCard('NA', 123, 'USD', 'MyCustomExternalReference', (error, result) => {
   console.log('client.createGiftCard response', error, result)
 })
 ```
