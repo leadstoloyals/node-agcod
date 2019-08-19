@@ -6,7 +6,18 @@ Node.js api gateway to the Amazon Giftcard On Demand Web service
 
 ## Configuration
 
-Create a `development.json`, `sandbox.json` and `production.json` in the config directory that looks like `example.json`.
+This clients expects the following environment variables to be present.
+
+- `AWS_ACCESS_KEY_ID` – Specifies an AWS access key associated with an IAM user or role.
+- `AWS_SECRET_ACCESS_KEY` – Specifies the secret key associated with the access key. This is essentially the "password" for the access key.
+- `AGCOD_PARTNERID` - A unique identifier (CASE SENSITIVE, 1st letter is capitalized and the next four are lower case) provided by the Amazon GC team. This value is part of the Payload of every AGCOD Gateway request.
+- `AGCOD_ENV` - production (default) or sandbox. Determines hosts used for connecting to the endpoints.
+
+```
+env          NA                         EU                            FE
+production   agcod-v2.amazon.com        agcod-v2-eu.amazon.com        agcod-v2-fe.amazon.com
+development  agcod-v2-gamma.amazon.com  agcod-v2-eu-gamma.amazon.com  agcod-v2-fe-gamma.amazon.com
+```
 
 ## Usage
 ```javascript

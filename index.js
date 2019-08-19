@@ -1,13 +1,47 @@
-const config = require('config')
 const BigNumber = require('bignumber.js')
 const request = require('request')
 const aws4 = require('aws4')
 const helpers = require('./lib/helpers')
 
+const {
+  AWS_ACCESS_KEY_ID,
+  AWS_SECRET_ACCESS_KEY,
+  AGCOD_PARTNERID,
+  AGCOD_ENV = 'production',
+} = process.env;
+
+const endpoints = {
+  "NA": {
+    "host": `agcod-v2${AGCOD_ENV === 'production' ? '' : '-gamma'}.amazon.com`,
+    "region": "us-east-1",
+    "countries": [ "US", "CA"]
+  },
+  "EU": {
+    "host": `agcod-v2-eu${AGCOD_ENV === 'production' ? '' : '-gamma'}.amazon.com`,
+    "region": "eu-west-1",
+    "countries": [ "IT", "ES", "DE", "FR", "UK"]
+  },
+  "FE": {
+    "host": `agcod-v2-fe${AGCOD_ENV === 'production' ? '' : '-gamma'}.amazon.com`,
+    "region": "us-west-2",
+    "countries": "JP"
+  }
+}
+
 module.exports = class {
   constructor(cfg = {}, defaults = {}) {
+    if (!AWS_ACCESS_KEY_ID) {
+      throw new Error(`Environment variable AWS_ACCESS_KEY_ID not present`)
+    }
+    if (!AWS_SECRET_ACCESS_KEY) {
+      throw new Error(`Environment variable AWS_SECRET_ACCESS_KEY not present`)
+    }
+    if (!AGCOD_PARTNERID) {
+      throw new Error(`Environment variable AGCOD_PARTNERID not present`)
+    }
+
     this.config = Object.assign({}, defaults)
-    this.config.partnerId = config.get('partnerId')
+    this.config.partnerId = AGCOD_PARTNERID
     Object.assign(this.config, cfg)
   }
 
@@ -79,8 +113,11 @@ module.exports = class {
    * @returns {Object}
    */
   _getSignedRequest(region, action, requestBody) {
-    const credentials = this.config.credentials || config.get('credentials')
-    const endpoint = config.get('endpoint')[region]
+    const credentials = this.config.credentials || {
+      "accessKeyId": AWS_ACCESS_KEY_ID,
+      "secretAccessKey": AWS_SECRET_ACCESS_KEY,
+    }
+    const endpoint = endpoints[region]
     const opts = {
       region: endpoint.region,
       host: endpoint.host,
