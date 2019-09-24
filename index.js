@@ -1,4 +1,3 @@
-const config = require('config')
 const BigNumber = require('bignumber.js')
 const request = require('request')
 const aws4 = require('aws4')
@@ -77,8 +76,8 @@ module.exports = class {
    * @returns {Object}
    */
   _getSignedRequest(region, action, requestBody) {
-    const credentials = this.config.credentials || config.get('credentials')
-    const endpoint = config.get('endpoint')[region]
+    const credentials = this.config.credentials;
+    const endpoint = this.config.endpoint[region]
     const opts = {
       region: endpoint.region,
       host: endpoint.host,
