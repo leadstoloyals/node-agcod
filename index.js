@@ -6,7 +6,7 @@ const helpers = require('./lib/helpers')
 
 module.exports = class {
   constructor(cfg = {}) {
-    this.config = Object.assign({}, cfg)
+    this.config = Object.assign({}, cfg, defaults);
   }
 
   createGiftCard(region, amount, currencyCode, cb) {
