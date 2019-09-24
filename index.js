@@ -5,10 +5,8 @@ const aws4 = require('aws4')
 const helpers = require('./lib/helpers')
 
 module.exports = class {
-  constructor(cfg = {}, defaults = {}) {
-    this.config = Object.assign({}, defaults)
-    this.config.partnerId = config.get('partnerId')
-    Object.assign(this.config, cfg)
+  constructor(cfg = {}) {
+    this.config = Object.assign({}, cfg)
   }
 
   createGiftCard(region, amount, currencyCode, cb) {
