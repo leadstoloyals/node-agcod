@@ -1,6 +1,6 @@
 {
   "name": "agcod",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Node.js api for the Amazon Gift Codes On Demand Web Services",
   "main": "index.js",
   "engines": {
