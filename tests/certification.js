@@ -1,8 +1,9 @@
 const tape = require('tape')
 const Client = require('../')
+const config = require('config')
 
 tape(`CC - Create and Cancel`, (t) => {
-  const client = new Client()
+  const client = new Client(config || {})
   const amount = 1000
   const currencyCode = 'USD'
 
@@ -33,7 +34,7 @@ tape(`CC - Create and Cancel`, (t) => {
 })
 
 tape(`DLB - Create request sanity check near discount's lower boundary - $0.01`, (t) => {
-  const client = new Client()
+  const client = new Client(config || {})
   const amount = 0.01
   const currencyCode = 'USD'
 
@@ -59,7 +60,7 @@ tape(`DLB - Create request sanity check near discount's lower boundary - $0.01`,
 })
 
 tape(`MAX - Create request for the maximum allowable GC - $2000.00`, (t) => {
-  const client = new Client()
+  const client = new Client(config || {})
   const amount = 2000
   const currencyCode = 'USD'
 
@@ -85,7 +86,7 @@ tape(`MAX - Create request for the maximum allowable GC - $2000.00`, (t) => {
 })
 
 tape(`IDM - Create requests idempotency Check`, (t) => {
-  const client = new Client()
+  const client = new Client(config || {})
   const amount = 1000
   const currencyCode = 'USD'
 
