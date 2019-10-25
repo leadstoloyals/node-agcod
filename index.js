@@ -4,7 +4,7 @@ const aws4 = require('aws4')
 const helpers = require('./lib/helpers')
 
 module.exports = class {
-  constructor(cfg) {
+  constructor(cfg = {}) {
     this.config = Object.assign({}, cfg);
   }
 
