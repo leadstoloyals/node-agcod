@@ -1,14 +1,11 @@
-const config = require('config')
 const BigNumber = require('bignumber.js')
 const request = require('request')
 const aws4 = require('aws4')
 const helpers = require('./lib/helpers')
 
 module.exports = class {
-  constructor(cfg = {}, defaults = {}) {
-    this.config = Object.assign({}, defaults)
-    this.config.partnerId = config.get('partnerId')
-    Object.assign(this.config, cfg)
+  constructor(cfg = {}) {
+    this.config = Object.assign({}, cfg);
   }
 
   createGiftCard(region, amount, currencyCode, cb) {
@@ -79,8 +76,8 @@ module.exports = class {
    * @returns {Object}
    */
   _getSignedRequest(region, action, requestBody) {
-    const credentials = this.config.credentials || config.get('credentials')
-    const endpoint = config.get('endpoint')[region]
+    const credentials = this.config.credentials;
+    const endpoint = this.config.endpoint[region]
     const opts = {
       region: endpoint.region,
       host: endpoint.host,

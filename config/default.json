@@ -15,5 +15,10 @@
       "region": "us-west-2",
       "countries": "JP"
     }
+  },
+  "partnerId": "PARTNERID",
+  "credentials": {
+    "accessKeyId": "ACCESSKEYID",
+    "secretAccessKey": "SECRETACCESSKEY"
   }
 }

@@ -3,16 +3,19 @@ const nock = require('nock')
 
 const helpers = require('../lib/helpers')
 const Client = require('../')
+const config = require('config')
 
 tape('authentication fails with wrong credentials', (t) => {
-  const client = new Client({
-    credentials: {
-      accessKeyId: 'fake-aws-key',
-      secretAccessKey: 'fake-secret-key',
-    }
-  })
-  const {signedRequest} = client.createGiftCard('NA', 123, 'USD', (err) => {
-    t.equal(err.statusCode, 403)
+  const client = new Client(Object.assign(config, {
+      credentials: {
+        accessKeyId: 'fake-aws-key',
+        secretAccessKey: 'fake-secret-key'
+      }
+    })
+  )
+ 
+  const {signedRequest} = client.createGiftCard('NA', 123, 'USD', (err, result) => {
+    t.equal(result, undefined)
     t.end()
   })
 
@@ -24,7 +27,7 @@ tape('authentication fails with wrong credentials', (t) => {
 })
 
 tape('createGiftCard', (t) => {
-  const client = new Client()
+  const client = new Client(config || {})
   const amount = 123
   const currencyCode = 'USD'
 
@@ -83,7 +86,7 @@ tape('createGiftCard', (t) => {
 })
 
 tape('cancelGiftCard', (t) => {
-  const client = new Client()
+  const client = new Client(config || {})
   const amount = 123
   const currencyCode = 'USD'
 
