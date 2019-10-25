@@ -32,15 +32,15 @@
   },
   "homepage": "https://github.com/leadstoloyals/node-agcod#readme",
   "devDependencies": {
-    "cross-env": "5.0.5",
-    "eslint": "^4.7.1",
-    "nock": "9.0.17",
-    "tape": "4.8.0"
+    "cross-env": "^6.0.3",
+    "eslint": "^6.5.1",
+    "nock": "^11.6.0",
+    "tape": "^4.11.0"
   },
   "dependencies": {
-    "aws4": "1.6.0",
-    "bignumber.js": "4.0.4",
-    "config": "1.26.2",
-    "request": "2.82.0"
+    "aws4": "^1.8.0",
+    "bignumber.js": "^9.0.0",
+    "config": "^3.2.3",
+    "request": "^2.88.0"
   }
 }
