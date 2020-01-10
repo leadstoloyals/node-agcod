@@ -1,8 +1,9 @@
 const tape = require('tape')
+const { config } = require('./fixtures')
 const Client = require('../')
 
 tape('generated id\'s do not collide (probably)', (t) => {
-  const client = new Client()
+  const client = new Client(config)
 
   let ids=[...Array(1e2)].map(()=>client._getNewId())
 
@@ -12,7 +13,7 @@ tape('generated id\'s do not collide (probably)', (t) => {
 
 tape('_getCreateGiftCardRequestBody', (t) => {
   const partnerId = 'Test'
-  const client = new Client({partnerId})
+  const client = new Client(config)
   const amount = 123
   const currencyCode = 'USD'
   const actual = client._getCreateGiftCardRequestBody('001', amount, currencyCode)
@@ -26,7 +27,7 @@ tape('_getCreateGiftCardRequestBody', (t) => {
 
 tape('_getCancelGiftCardRequestBody', (t) => {
   const partnerId = 'Test'
-  const client = new Client({partnerId})
+  const client = new Client(config)
   const gcId = 'xyz'
   const actual = client._getCancelGiftCardRequestBody('001', gcId)
   t.deepEqual(actual, {
@@ -38,7 +39,7 @@ tape('_getCancelGiftCardRequestBody', (t) => {
 })
 
 tape('_checkRegion', (t) => {
-  const client = new Client()
+  const client = new Client(config)
   const amount = 123
   const currencyCode = 'USD'
 
@@ -51,17 +52,15 @@ tape('_checkRegion', (t) => {
 })
 
 tape('_getSignedRequest', (t) => {
-  const partnerId = 'Test'
-  const client = new Client({
-    partnerId,
-    credentials: {
-      accessKeyId: 'fake-aws-key',
-      secretAccessKey: 'fake-secret-key',
+  const augmentedConfig = Object.assign(
+    {
+      extraHeaders: {
+        'x-amz-date': '20170918T133138Z'
+      },
     },
-    extraHeaders: {
-      'x-amz-date': '20170918T133138Z'
-    }
-  })
+    config
+  );
+  const client = new Client(augmentedConfig);
   const amount = 123
   const currencyCode = 'USD'
   const requestBody = client._getCreateGiftCardRequestBody('001', amount, currencyCode)

@@ -4,45 +4,33 @@ const aws4 = require('aws4')
 const helpers = require('./lib/helpers')
 
 const {
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
+  AGCOD_ACCESS_KEY_ID,
+  AGCOD_SECRET_ACCESS_KEY,
   AGCOD_PARTNERID,
   AGCOD_ENV = 'production',
 } = process.env;
 
-const endpoints = {
-  "NA": {
-    "host": `agcod-v2${AGCOD_ENV === 'production' ? '' : '-gamma'}.amazon.com`,
-    "region": "us-east-1",
-    "countries": [ "US", "CA"]
-  },
-  "EU": {
-    "host": `agcod-v2-eu${AGCOD_ENV === 'production' ? '' : '-gamma'}.amazon.com`,
-    "region": "eu-west-1",
-    "countries": [ "IT", "ES", "DE", "FR", "UK"]
-  },
-  "FE": {
-    "host": `agcod-v2-fe${AGCOD_ENV === 'production' ? '' : '-gamma'}.amazon.com`,
-    "region": "us-west-2",
-    "countries": "JP"
-  }
-}
-
 module.exports = class {
-  constructor(cfg = {}, defaults = {}) {
-    if (!AWS_ACCESS_KEY_ID) {
-      throw new Error(`Environment variable AWS_ACCESS_KEY_ID not present`)
-    }
-    if (!AWS_SECRET_ACCESS_KEY) {
-      throw new Error(`Environment variable AWS_SECRET_ACCESS_KEY not present`)
-    }
-    if (!AGCOD_PARTNERID) {
-      throw new Error(`Environment variable AGCOD_PARTNERID not present`)
-    }
+  constructor(cfg = {}) {
+    this.config = Object.assign({}, {
+      // defaults to the environment variables that may be present
+      accessKeyId: AGCOD_ACCESS_KEY_ID,
+      secretAccessKey: AGCOD_SECRET_ACCESS_KEY,
+      partnerId: AGCOD_PARTNERID,
+      env: AGCOD_ENV,
+    }, cfg)
 
-    this.config = Object.assign({}, defaults)
-    this.config.partnerId = AGCOD_PARTNERID
-    Object.assign(this.config, cfg)
+    // console.log('construct', cfg, this.config);
+
+    if (!this.config.accessKeyId) {
+      throw new Error(`Either make sure environment variable AGCOD_ACCESS_KEY_ID is present OR pass a config with key accessKeyId`)
+    }
+    if (!this.config.secretAccessKey) {
+      throw new Error(`Either make sure environment variable AGCOD_SECRET_ACCESS_KEY is present OR pass a config with key secretAccessKey`)
+    }
+    if (!this.config.partnerId) {
+      throw new Error(`Either make sure environment variable AGCOD_PARTNERID is present OR pass a config with key partnerId`)
+    }
   }
 
   createGiftCard(region, amount, currencyCode, cb) {
@@ -71,6 +59,24 @@ module.exports = class {
     const req = this._doRequest(signedRequest, cb)
 
     return {req, requestBody, signedRequest}
+  }
+
+  _getEndpoint(region) {
+    if (region === 'NA') return {
+      "host": `agcod-v2${this.config.env === 'production' ? '' : '-gamma'}.amazon.com`,
+      "region": "us-east-1",
+      "countries": [ "US", "CA"]
+    };
+    if (region === 'EU') return {
+      "host": `agcod-v2-eu${this.config.env === 'production' ? '' : '-gamma'}.amazon.com`,
+      "region": "eu-west-1",
+      "countries": [ "IT", "ES", "DE", "FR", "UK"]
+    };
+    if (region === 'FE') return {
+      "host": `agcod-v2-fe${this.config.env === 'production' ? '' : '-gamma'}.amazon.com`,
+      "region": "us-west-2",
+      "countries": "JP"
+    };
   }
 
   /**
@@ -113,11 +119,11 @@ module.exports = class {
    * @returns {Object}
    */
   _getSignedRequest(region, action, requestBody) {
-    const credentials = this.config.credentials || {
-      "accessKeyId": AWS_ACCESS_KEY_ID,
-      "secretAccessKey": AWS_SECRET_ACCESS_KEY,
+    const credentials = {
+      "accessKeyId": this.config.accessKeyId,
+      "secretAccessKey": this.config.secretAccessKey,
     }
-    const endpoint = endpoints[region]
+    const endpoint = this._getEndpoint(region);
     const opts = {
       region: endpoint.region,
       host: endpoint.host,

@@ -12,7 +12,9 @@
     "pretest:sandbox": "eslint --ext=.js .",
     "test:sandbox": "cross-env NODE_ENV=sandbox tape ./tests/*.js",
     "pretest:certification": "eslint --ext=.js .",
-    "test:certification": "cross-env NODE_ENV=sandbox tape ./tests/certification.js"
+    "test:certification": "cross-env NODE_ENV=sandbox tape ./tests/certification.js",
+    "pretest:unit": "eslint --ext=.js .",
+    "test:unit": "cross-env NODE_ENV=sandbox tape ./tests/unit.js"
   },
   "repository": {
     "type": "git",
