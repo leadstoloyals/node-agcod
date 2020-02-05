@@ -36,6 +36,12 @@ module.exports = class {
   createGiftCard(region, amount, currencyCode, externalReference, cb) {
     this._checkRegion(region)
     const sequentialId = this._getNewId()
+    // The first 3 parameters are mandatory, but externalReference is not and originally
+    // it wasn't even there, so if that one is a function we make cb that one.
+    if (typeof externalReference === 'function') {
+      cb = externalReference;
+      externalReference = undefined;
+    }
     const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode, externalReference)
     const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody)
     const req = this._doRequest(signedRequest, cb)
