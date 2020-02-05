@@ -1,6 +1,10 @@
 Node.js api gateway to the Amazon Giftcard On Demand Web service
 ============
 
+## About this fork
+
+I added a parameter `externalReference` which allows you to push some additional informations to your Amazon AGCOD dashboard about the created gift cards.
+
 ## Install
 `npm install agcod`
 
@@ -26,7 +30,7 @@ development  agcod-v2-gamma.amazon.com  agcod-v2-eu-gamma.amazon.com  agcod-v2-f
 const Client = require('agcod')
 const client = new Client()
 
-client.createGiftCard('NA', 123, 'USD', (error, result) => {
+client.createGiftCard('NA', 123, 'USD', 'MyCustomExternalReference', (error, result) => {
   console.log('client.createGiftCard response', error, result)
 })
 ```
