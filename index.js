@@ -133,7 +133,7 @@ module.exports = class {
    */
   _getNewId()  {
     let hrTime = process.hrtime()
-    let id = new BigNumber(hrTime[0]).times('1e9').plus(hrTime[1]).toString(36)
+    let id = new BigNumber.BigNumber(hrTime[0]).times('1e9').plus(hrTime[1]).toString(36)
     return id
   }
 }
