@@ -1,7 +1,9 @@
-const BigNumber = require('bignumber.js')
-const request = require('request')
-const aws4 = require('aws4')
-const helpers = require('./lib/helpers')
+const BigNumber = require('bignumber.js');
+const request = require('request');
+const aws4 = require('aws4');
+const helpers = require('./lib/helpers');
+
+const axios = require('axios').default;
 
 module.exports = class {
   constructor(cfg = {}) {
@@ -9,39 +11,59 @@ module.exports = class {
   }
 
   createGiftCard(region, amount, currencyCode, cb) {
-    this._checkRegion(region)
-    const sequentialId = this._getNewId()
-    const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode)
-    const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody)
-    const req = this._doRequest(signedRequest, cb)
+    try {
+      this._checkRegion(region);
+      const sequentialId = this._getNewId();
+      const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode);
+      const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody);
+      const req = this._doRequest(signedRequest, cb);
 
-    return {req, sequentialId, requestBody, signedRequest}
+      return { req, sequentialId, requestBody, signedRequest };
+    } catch (error) {
+      console.log('Error: ', error);
+      throw new Error(error);
+    }
+  }
+
+  async createGiftCardAsync(region, amount, currencyCode) {
+    try {
+      this._checkRegion(region);
+      const sequentialId = this._getNewId();
+      const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode);
+      const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody);
+      const res = await this._doRequestAsync(signedRequest);
+
+      return res;
+    } catch (error) {
+      console.log('Error: ', error);
+      throw new Error(error);
+    }
   }
 
   createGiftCardAgain(region, amount, currencyCode, sequentialId, cb) {
-    this._checkRegion(region)
-    const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode)
-    const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody)
-    const req = this._doRequest(signedRequest, cb)
+    this._checkRegion(region);
+    const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode);
+    const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody);
+    const req = this._doRequest(signedRequest, cb);
 
-    return {req, sequentialId, requestBody, signedRequest}
+    return { req, sequentialId, requestBody, signedRequest };
   }
 
   cancelGiftCard(region, sequentialId, gcId, cb) {
-    this._checkRegion(region)
-    const requestBody = this._getCancelGiftCardRequestBody(sequentialId, gcId)
-    const signedRequest = this._getSignedRequest(region, 'CancelGiftCard', requestBody)
-    const req = this._doRequest(signedRequest, cb)
+    this._checkRegion(region);
+    const requestBody = this._getCancelGiftCardRequestBody(sequentialId, gcId);
+    const signedRequest = this._getSignedRequest(region, 'CancelGiftCard', requestBody);
+    const req = this._doRequest(signedRequest, cb);
 
-    return {req, requestBody, signedRequest}
+    return { req, requestBody, signedRequest };
   }
 
   /**
    * Throws when region is not NA, EU or FE
    */
   _checkRegion(region) {
-    if (['NA', 'EU', 'FE'].indexOf(region) === -1 ) {
-      throw new Error(`First argument must be string NA, EU or FE`)
+    if (['NA', 'EU', 'FE'].indexOf(region) === -1) {
+      throw new Error(`First argument must be string NA, EU or FE`);
     }
   }
 
@@ -50,10 +72,7 @@ module.exports = class {
    * @returns {Object}
    */
   _getCreateGiftCardRequestBody(sequentialId, amount, currencyCode) {
-    return helpers.CreateGiftCardRequest(
-      this.config.partnerId,
-      sequentialId, amount, currencyCode
-    )
+    return helpers.CreateGiftCardRequest(this.config.partnerId, sequentialId, amount, currencyCode);
   }
 
   /**
@@ -61,10 +80,7 @@ module.exports = class {
    * @returns {Object}
    */
   _getCancelGiftCardRequestBody(sequentialId, gcId) {
-    return helpers.CancelGiftCardRequest(
-      this.config.partnerId,
-      sequentialId, gcId
-    )
+    return helpers.CancelGiftCardRequest(this.config.partnerId, sequentialId, gcId);
   }
 
   /**
@@ -77,7 +93,7 @@ module.exports = class {
    */
   _getSignedRequest(region, action, requestBody) {
     const credentials = this.config.credentials;
-    const endpoint = this.config.endpoint[region]
+    const endpoint = this.config.endpoint[region];
     const opts = {
       region: endpoint.region,
       host: endpoint.host,
@@ -85,16 +101,19 @@ module.exports = class {
       body: JSON.stringify(requestBody),
       // defaults
       service: 'AGCODService',
-      headers: Object.assign({
-        'accept': `application/json`,
-        'content-type': `application/json`,
-        'x-amz-target': `com.amazonaws.agcod.AGCODService.${action}`
-      }, this.config.extraHeaders),
+      headers: Object.assign(
+        {
+          accept: `application/json`,
+          'content-type': `application/json`,
+          'x-amz-target': `com.amazonaws.agcod.AGCODService.${action}`,
+        },
+        this.config.extraHeaders
+      ),
       method: 'POST',
-      securityOptions: 'SSL_OP_NO_SSLv3'
-    }
+      securityOptions: 'SSL_OP_NO_SSLv3',
+    };
 
-    return aws4.sign(opts, credentials)
+    return aws4.sign(opts, credentials);
   }
 
   /**
@@ -108,32 +127,57 @@ module.exports = class {
       method: 'POST',
       url: `https://${signedRequest.host}${signedRequest.path}`,
       headers: signedRequest.headers,
-      body: signedRequest.body
-    }
+      body: signedRequest.body,
+    };
 
     return request(params, (error, response, result) => {
-      if (error) return cb(error)
+      if (error) return cb(error);
 
       if (response.statusCode !== 200) {
-        const err = Object.assign({
-          request: params,
-          statusCode: response.statusCode
-        }, JSON.parse(result))
+        const err = Object.assign(
+          {
+            request: params,
+            statusCode: response.statusCode,
+          },
+          JSON.parse(result)
+        );
 
-        return cb(err)
+        return cb(err);
       }
 
-      return cb(null, JSON.parse(result))
-    })
+      return cb(null, JSON.parse(result));
+    });
+  }
+
+  async _doRequestAsync(signedRequest) {
+    const params = {
+      method: 'POST',
+      url: `https://${signedRequest.host}${signedRequest.path}`,
+      headers: signedRequest.headers,
+      body: signedRequest.body,
+    };
+
+    const res = await axios.post(`https://${signedRequest.host}${signedRequest.path}`, signedRequest.body, {
+      headers: signedRequest.headers,
+    });
+    if (res.status !== 200) {
+      const err = {
+        request: params,
+        statusCode: res.status,
+      };
+
+      return err;
+    }
+    return res.data;
   }
 
   /**
    * Generates a unique sequential base-36 string based on processor time
    * @returns string with length of 10
    */
-  _getNewId()  {
-    let hrTime = process.hrtime()
-    let id = new BigNumber(hrTime[0]).times('1e9').plus(hrTime[1]).toString(36)
-    return id
+  _getNewId() {
+    let hrTime = process.hrtime();
+    let id = new BigNumber.BigNumber(hrTime[0]).times('1e9').plus(hrTime[1]).toString(36);
+    return id;
   }
-}
+};
