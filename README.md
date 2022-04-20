@@ -6,7 +6,7 @@ Node.js api gateway to the Amazon Giftcard On Demand Web service
 
 ## Configuration
 
-Create a `development.json`, `sandbox.json` and `production.json` in the config directory that looks like `example.json`.
+Create a directory `config` in the root of your app. And add a `development.json`, `sandbox.json` and `production.json` in it that look like `config/example.json` in this repo.
 
 ## Usage
 ```javascript
