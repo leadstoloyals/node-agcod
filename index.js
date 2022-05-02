@@ -1,21 +1,40 @@
 const BigNumber = require('bignumber.js')
 const request = require('request')
 const aws4 = require('aws4')
+const config = require('config')
 const helpers = require('./lib/helpers')
-
 module.exports = class {
   constructor(cfg = {}) {
-    this.config = Object.assign({}, cfg);
+    var env = process.env.NODE_ENV || 'sandbox'
+    var fn = './.acogd/' + env + '.json'
+    if (typeof cfg == 'string') { fn = cfg; cfg = {} }
+    if (Object.keys(cfg).length == 0) {
+      cfg = require(fn)
+    }
+    this.config = Object.assign(config, cfg)
+    if (!this.config.partnerId)
+      throw new Error('No partner ID supplied')
+    var creds = this.config.credentials
+    if (!creds.accessKeyId || !creds.secretAccessKey)
+      throw new Error('Invalid credentials supplied!')
   }
 
-  createGiftCard(region, amount, currencyCode, cb) {
-    this._checkRegion(region)
+  createGiftCard(country, amount, currencyCode, cb) {
+    var region = this._getRegion(country)
+    if (amount < 0)
+      throw new Error('Amounts supplied must be positive!')
+    if (typeof currencyCode === 'function') {
+      cb = currencyCode
+      currencyCode = this.config.currency[country]
+      if (!currencyCode)
+        throw new Error('No currency available for county selected!')
+    }
     const sequentialId = this._getNewId()
     const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode)
     const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody)
     const req = this._doRequest(signedRequest, cb)
 
-    return {req, sequentialId, requestBody, signedRequest}
+    return { req, sequentialId, requestBody, signedRequest }
   }
 
   createGiftCardAgain(region, amount, currencyCode, sequentialId, cb) {
@@ -24,7 +43,7 @@ module.exports = class {
     const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody)
     const req = this._doRequest(signedRequest, cb)
 
-    return {req, sequentialId, requestBody, signedRequest}
+    return { req, sequentialId, requestBody, signedRequest }
   }
 
   cancelGiftCard(region, sequentialId, gcId, cb) {
@@ -33,16 +52,26 @@ module.exports = class {
     const signedRequest = this._getSignedRequest(region, 'CancelGiftCard', requestBody)
     const req = this._doRequest(signedRequest, cb)
 
-    return {req, requestBody, signedRequest}
+    return { req, requestBody, signedRequest }
   }
 
   /**
    * Throws when region is not NA, EU or FE
    */
   _checkRegion(region) {
-    if (['NA', 'EU', 'FE'].indexOf(region) === -1 ) {
-      throw new Error(`First argument must be string NA, EU or FE`)
+    var regions = Object.keys(this.config.endpoint)
+    if (regions.indexOf(region) === -1) {
+      throw new Error('Region must be one of: ' + regions.join(', '))
     }
+  }
+
+  _getRegion(country) {
+    var e = this.config.endpoint
+    for (var k of Object.keys(e)) {
+      if (e[k].countries.indexOf(country) > -1)
+        return k
+    }
+    throw new Error(`No valid country code provided!`)
   }
 
   /**
@@ -131,7 +160,7 @@ module.exports = class {
    * Generates a unique sequential base-36 string based on processor time
    * @returns string with length of 10
    */
-  _getNewId()  {
+  _getNewId() {
     let hrTime = process.hrtime()
     let id = new BigNumber(hrTime[0]).times('1e9').plus(hrTime[1]).toString(36)
     return id

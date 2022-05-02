@@ -6,14 +6,37 @@ Node.js api gateway to the Amazon Giftcard On Demand Web service
 
 ## Configuration
 
-Create a directory `config` in the root of your app. And add a `development.json`, `sandbox.json` and `production.json` in it that look like `config/example.json` in this repo.
-
+Create a directory `.agcod` in the root of your app, adding your credentials to files named with the expected values of `NODE_ENV` e.g. `.agcod/sandbox.json`.  Credentials look like this:
+```json
+{
+  "partnerId": "A2c4E",
+  "credentials": {
+    "accessKeyId": "AKI12345678",
+    "secretAccessKey": "qwertyQWERTY1234567QWERTYqwerty1234567"
+  }
+}
+```
 ## Usage
 ```javascript
 const Client = require('agcod')
-const client = new Client()
+// the client can be created a number of ways:
+// 1. will use the NODE_ENV to look for a .json file in .agcod/
+const client = new Client() 
+// 2. may be given a file name containing credentials
+const client = new Client('./sandbox.json')
+// 3. explicitly passed a credentials object
+const client = new Client({
+  "partnerId": "A2c4E",
+  "credentials": {
+    "accessKeyId": "AKI12345678",
+    "secretAccessKey": "qwertyQWERTY1234567QWERTYqwerty1234567"
+  }
+})
 
-client.createGiftCard('NA', 123, 'USD', (error, result) => {
+// now create a gift card, indicating the country for which
+// to create it and the amount
+
+client.createGiftCard('US', 100, (error, result) => {
   console.log('client.createGiftCard response', error, result)
 })
 ```

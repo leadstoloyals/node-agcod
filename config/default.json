@@ -1,24 +1,61 @@
 {
+  "currency": {
+    "US": "USD",
+    "IT": "EUR",
+    "ES": "EUR",
+    "DE": "EUR",
+    "FR": "EUR",
+    "UK": "GBP",
+    "TR": "TRY",
+    "UAE": "AED",
+    "KSA": "SAR",
+    "PL": "EUR",
+    "NL": "EUR",
+    "SE": "SEK",
+    "JP": "JPY",
+    "AU": "AUD",
+    "SG": "SGD"
+  },
   "endpoint": {
     "NA": {
       "host": "agcod-v2-gamma.amazon.com",
       "region": "us-east-1",
-      "countries": [ "US", "CA"]
+      "countries": [
+        "US",
+        "CA",
+        "MX"
+      ]
     },
     "EU": {
       "host": "agcod-v2-eu-gamma.amazon.com",
       "region": "eu-west-1",
-      "countries": [ "IT", "ES", "DE", "FR", "UK"]
+      "countries": [
+        "IT",
+        "ES",
+        "DE",
+        "FR",
+        "UK",
+        "TR",
+        "UAE",
+        "KSA",
+        "PL",
+        "NL",
+        "SE"
+      ]
     },
     "FE": {
       "host": "agcod-v2-fe-gamma.amazon.com",
       "region": "us-west-2",
-      "countries": "JP"
+      "countries": [
+        "JP",
+        "AU",
+        "SG"
+      ]
     }
   },
-  "partnerId": "PARTNERID",
+  "partnerId": "",
   "credentials": {
-    "accessKeyId": "ACCESSKEYID",
-    "secretAccessKey": "SECRETACCESSKEY"
+    "accessKeyId": "",
+    "secretAccessKey": ""
   }
 }
