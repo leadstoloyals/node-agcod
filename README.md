@@ -39,6 +39,13 @@ const client = new Client({
 client.createGiftCard('US', 100, (error, result) => {
   console.log('client.createGiftCard response', error, result)
 })
+
+// an explicit currency may be passed but may be rejected by the system
+
+client.createGiftCard('US', 100, 'GBP', (error, result) => {
+  console.log('client.createGiftCard response', error, result)
+})
+
 ```
 
 ## Tests
