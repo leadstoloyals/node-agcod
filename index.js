@@ -6,7 +6,7 @@ const helpers = require('./lib/helpers')
 module.exports = class {
   constructor(cfg = {}) {
     var env = process.env.NODE_ENV || 'sandbox'
-    var fn = './.acogd/' + env + '.json'
+    var fn = './.agcod/' + env + '.json'
     if (typeof cfg == 'string') { fn = cfg; cfg = {} }
     if (Object.keys(cfg).length == 0) {
       cfg = require(fn)
