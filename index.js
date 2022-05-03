@@ -1,8 +1,9 @@
 const BigNumber = require('bignumber.js')
-const request = require('request')
 const aws4 = require('aws4')
 const config = require('config')
 const helpers = require('./lib/helpers')
+const fetch = require('node-fetch')
+
 module.exports = class {
   constructor(cfg = {}) {
     var env = process.env.NODE_ENV || 'sandbox'
@@ -23,7 +24,7 @@ module.exports = class {
     var region = this._getRegion(country)
     if (amount < 0)
       throw new Error('Amounts supplied must be positive!')
-    if (typeof currencyCode === 'function') {
+    if (!currencyCode || typeof currencyCode === 'function') {
       cb = currencyCode
       currencyCode = this.config.currency[country]
       if (!currencyCode)
@@ -32,27 +33,37 @@ module.exports = class {
     const sequentialId = this._getNewId()
     const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode)
     const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody)
-    const req = this._doRequest(signedRequest, cb)
+    const ret = this._doRequest(signedRequest)
+    if (cb) {
+      ret.then(({ res }) => cb(null, res, signedRequest)).catch(e => cb(e))
+      return
+    }
 
-    return { req, sequentialId, requestBody, signedRequest }
+    return ret
   }
 
   createGiftCardAgain(region, amount, currencyCode, sequentialId, cb) {
     this._checkRegion(region)
     const requestBody = this._getCreateGiftCardRequestBody(sequentialId, amount, currencyCode)
     const signedRequest = this._getSignedRequest(region, 'CreateGiftCard', requestBody)
-    const req = this._doRequest(signedRequest, cb)
-
-    return { req, sequentialId, requestBody, signedRequest }
+    const ret = this._doRequest(signedRequest)
+    if (cb) {
+      ret.then(({ res }) => cb(null, res, signedRequest)).catch(e => cb(e))
+      return
+    }
+    return ret
   }
 
   cancelGiftCard(region, sequentialId, gcId, cb) {
     this._checkRegion(region)
     const requestBody = this._getCancelGiftCardRequestBody(sequentialId, gcId)
     const signedRequest = this._getSignedRequest(region, 'CancelGiftCard', requestBody)
-    const req = this._doRequest(signedRequest, cb)
-
-    return { req, requestBody, signedRequest }
+    const req = this._doRequest(signedRequest)
+    if (cb) {
+      ret.then(({ res }) => cb(null, res, signedRequest)).catch(e => cb(e))
+      return
+    }
+    return ret
   }
 
   /**
@@ -105,7 +116,7 @@ module.exports = class {
    * @returns {Object}
    */
   _getSignedRequest(region, action, requestBody) {
-    const credentials = this.config.credentials;
+    const credentials = this.config.credentials
     const endpoint = this.config.endpoint[region]
     const opts = {
       region: endpoint.region,
@@ -132,28 +143,16 @@ module.exports = class {
    * @param {Function} cb - Callback function
    * @returns {Object} - whatever node-request returns
    */
-  _doRequest(signedRequest, cb) {
-    const params = {
-      method: 'POST',
-      url: `https://${signedRequest.host}${signedRequest.path}`,
+
+
+  _doRequest(signedRequest) {
+    var url = `https://${signedRequest.host}${signedRequest.path}`
+    return fetch(url, {
+      method: 'post',
       headers: signedRequest.headers,
-      body: signedRequest.body
-    }
-
-    return request(params, (error, response, result) => {
-      if (error) return cb(error)
-
-      if (response.statusCode !== 200) {
-        const err = Object.assign({
-          request: params,
-          statusCode: response.statusCode
-        }, JSON.parse(result))
-
-        return cb(err)
-      }
-
-      return cb(null, JSON.parse(result))
-    })
+      body: signedRequest.body,
+    }).then(res => res.json())
+      .then(res => ({ res, signedRequest }))
   }
 
   /**

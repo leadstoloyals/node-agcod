@@ -37,7 +37,20 @@ const client = new Client({
 // to create it and the amount
 
 client.createGiftCard('US', 100, (error, result) => {
-  console.log('client.createGiftCard response', error, result)
+  console.log('createGiftCard response', error, result)
+})
+
+// or use promises, a more modern approach
+
+client.createGiftCard('US', 100).then(({res, signedRequest}) => {
+  console.log('createGiftCard response', res)
+  console.log('signed request', signedRequest) // useful for debugging purposes as this may be passed to curl
+})
+
+// an explicit currency may be passed but may be rejected by the system
+
+client.createGiftCard('US', 100, 'GBP', (error, result) => {
+  console.log('createGiftCard response', error, result)
 })
 ```
 
