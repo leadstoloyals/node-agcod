@@ -1,13 +1,13 @@
 const BigNumber = require('bignumber.js')
 const aws4 = require('aws4')
-const config = require('config')
+const config = require('./config/default.json')
 const helpers = require('./lib/helpers')
 const fetch = require('node-fetch')
 
 module.exports = class {
   constructor(cfg = {}) {
-    var env = process.env.NODE_ENV || 'sandbox'
-    var fn = './.acogd/' + env + '.json'
+    var env = process.env.NODE_ENV || 'development'
+    var fn = './.agcod/' + env + '.json'
     if (typeof cfg == 'string') { fn = cfg; cfg = {} }
     if (Object.keys(cfg).length == 0) {
       cfg = require(fn)

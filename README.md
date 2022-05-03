@@ -52,8 +52,30 @@ client.createGiftCard('US', 100).then(({res, signedRequest}) => {
 client.createGiftCard('US', 100, 'GBP', (error, result) => {
   console.log('createGiftCard response', error, result)
 })
-```
 
+// an explicit currency may be passed but may be rejected by the system
+
+client.createGiftCard('US', 100, 'GBP', (error, result) => {
+  console.log('client.createGiftCard response', error, result)
+})
+
+```
+The above card creation will result in an object like:
+```js
+client.createGiftCard response null {
+  cardInfo: {
+    cardNumber: null,
+    cardStatus: 'Fulfilled',
+    expirationDate: null,
+    value: { amount: 100, currencyCode: 'USD' }
+  },
+  creationRequestId: 'Lif132190216bqrq',
+  gcClaimCode: '6X6M-PHKYAW-JMAY',
+  gcExpirationDate: null,
+  gcId: '1511461022170005',
+  status: 'SUCCESS'
+}
+```
 ## Tests
 During tests requests are intercepted by nock and responds with a desired response code and contents.
 - https://davidwalsh.name/nock
