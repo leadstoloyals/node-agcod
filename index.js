@@ -7,7 +7,7 @@ const fetch = require('node-fetch')
 module.exports = class {
   constructor(cfg = {}) {
     var env = process.env.NODE_ENV || 'development'
-    var fn = './.agcod/' + env + '.json'
+    var fn = process.cwd() + '/.agcod/' + env + '.json'
     if (typeof cfg == 'string') { fn = cfg; cfg = {} }
     if (Object.keys(cfg).length == 0) {
       cfg = require(fn)
