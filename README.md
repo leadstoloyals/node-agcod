@@ -6,18 +6,76 @@ Node.js api gateway to the Amazon Giftcard On Demand Web service
 
 ## Configuration
 
-Create a directory `config` in the root of your app. And add a `development.json`, `sandbox.json` and `production.json` in it that look like `config/example.json` in this repo.
-
+Create a directory `.agcod` in the root of your app, adding your credentials to files named with the expected values of `NODE_ENV` e.g. `.agcod/sandbox.json`.  Credentials look like this:
+```json
+{
+  "partnerId": "A2c4E",
+  "credentials": {
+    "accessKeyId": "AKI12345678",
+    "secretAccessKey": "qwertyQWERTY1234567QWERTYqwerty1234567"
+  }
+}
+```
 ## Usage
 ```javascript
 const Client = require('agcod')
-const client = new Client()
+// the client can be created a number of ways:
+// 1. will use the NODE_ENV to look for a .json file in .agcod/
+const client = new Client() 
+// 2. may be given a file name containing credentials
+const client = new Client('./sandbox.json')
+// 3. explicitly passed a credentials object
+const client = new Client({
+  "partnerId": "A2c4E",
+  "credentials": {
+    "accessKeyId": "AKI12345678",
+    "secretAccessKey": "qwertyQWERTY1234567QWERTYqwerty1234567"
+  }
+})
 
-client.createGiftCard('NA', 123, 'USD', (error, result) => {
+// now create a gift card, indicating the country for which
+// to create it and the amount
+
+client.createGiftCard('US', 100, (error, result) => {
+  console.log('createGiftCard response', error, result)
+})
+
+// or use promises, a more modern approach
+
+client.createGiftCard('US', 100).then(({res, signedRequest}) => {
+  console.log('createGiftCard response', res)
+  console.log('signed request', signedRequest) // useful for debugging purposes as this may be passed to curl
+})
+
+// an explicit currency may be passed but may be rejected by the system
+
+client.createGiftCard('US', 100, 'GBP', (error, result) => {
+  console.log('createGiftCard response', error, result)
+})
+
+// an explicit currency may be passed but may be rejected by the system
+
+client.createGiftCard('US', 100, 'GBP', (error, result) => {
   console.log('client.createGiftCard response', error, result)
 })
-```
 
+```
+The above card creation will result in an object like:
+```js
+client.createGiftCard response null {
+  cardInfo: {
+    cardNumber: null,
+    cardStatus: 'Fulfilled',
+    expirationDate: null,
+    value: { amount: 100, currencyCode: 'USD' }
+  },
+  creationRequestId: 'Lif132190216bqrq',
+  gcClaimCode: '6X6M-PHKYAW-JMAY',
+  gcExpirationDate: null,
+  gcId: '1511461022170005',
+  status: 'SUCCESS'
+}
+```
 ## Tests
 During tests requests are intercepted by nock and responds with a desired response code and contents.
 - https://davidwalsh.name/nock

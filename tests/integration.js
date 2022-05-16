@@ -7,22 +7,22 @@ const config = require('config')
 
 tape('authentication fails with wrong credentials', (t) => {
   const client = new Client(Object.assign(config, {
-      credentials: {
-        accessKeyId: 'fake-aws-key',
-        secretAccessKey: 'fake-secret-key'
-      }
-    })
+    credentials: {
+      accessKeyId: 'fake-aws-key',
+      secretAccessKey: 'fake-secret-key'
+    }
+  })
   )
- 
-  const {signedRequest} = client.createGiftCard('NA', 123, 'USD', (err, result) => {
+
+  const { signedRequest } = client.createGiftCard('US', 100, (err, result) => {
     t.equal(result, undefined)
     t.end()
   })
 
   if (process.env.NODE_ENV === 'development') {
     nock(`https://${signedRequest.host}`)
-    .post('/CreateGiftCard')
-    .reply(403, {})
+      .post('/CreateGiftCard')
+      .reply(403, {})
   }
 })
 
@@ -31,7 +31,7 @@ tape('createGiftCard', (t) => {
   const amount = 123
   const currencyCode = 'USD'
 
-  const {sequentialId, signedRequest} = client.createGiftCard('NA', amount, currencyCode, (error, result) => {
+  const { sequentialId, signedRequest } = client.createGiftCard('US', amount, (error, result) => {
     t.notOk(error, 'no error')
     t.equal(typeof result, 'object', 'result is an object')
     t.equal(typeof result.gcClaimCode, 'string', 'result.gcClaimCode is a string')
@@ -50,7 +50,7 @@ tape('createGiftCard', (t) => {
     t.equal(result.cardInfo.value.amount, amount)
     t.equal(result.cardInfo.cardStatus, 'Fulfilled')
     t.equal(result.gcId.length > 0, true)
-    t.equal(result.creationRequestId.slice(0,5), client.config.partnerId)
+    t.equal(result.creationRequestId.slice(0, 5), client.config.partnerId)
     t.equal(result.status, 'SUCCESS')
 
     t.end()
@@ -79,8 +79,8 @@ tape('createGiftCard', (t) => {
     )
 
     nock(`https://${signedRequest.host}`)
-    .post('/CreateGiftCard')
-    .reply(200, responseBody)
+      .post('/CreateGiftCard')
+      .reply(200, responseBody)
   }
 
 })
@@ -90,7 +90,7 @@ tape('cancelGiftCard', (t) => {
   const amount = 123
   const currencyCode = 'USD'
 
-  const {sequentialId, signedRequest} = client.createGiftCard('NA', amount, currencyCode, (error, result) => {
+  const { sequentialId, signedRequest } = client.createGiftCard('US', amount, (error, result) => {
     t.notOk(error, 'no error')
 
     t.equal(result.gcClaimCode.length > 0, true)
@@ -98,15 +98,15 @@ tape('cancelGiftCard', (t) => {
     t.equal(result.cardInfo.value.amount, amount)
     t.equal(result.cardInfo.cardStatus, 'Fulfilled')
     t.equal(result.gcId.length > 0, true)
-    t.equal(result.creationRequestId.slice(0,5), client.config.partnerId)
+    t.equal(result.creationRequestId.slice(0, 5), client.config.partnerId)
     t.equal(result.status, 'SUCCESS')
 
     if (process.env.NODE_ENV === 'development') {
       nock(`https://${signedRequest.host}`)
-      .post('/CancelGiftCard')
-      .reply(200, helpers.CancelGiftCardResponse(
-        client.config.partnerId, sequentialId, result.gcId
-      ))
+        .post('/CancelGiftCard')
+        .reply(200, helpers.CancelGiftCardResponse(
+          client.config.partnerId, sequentialId, result.gcId
+        ))
     }
 
     client.cancelGiftCard('NA', sequentialId, result.gcId, (error, result) => {
@@ -119,10 +119,9 @@ tape('cancelGiftCard', (t) => {
 
   if (process.env.NODE_ENV === 'development') {
     nock(`https://${signedRequest.host}`)
-    .post('/CreateGiftCard')
-    .reply(200, helpers.CreateGiftCardResponse(
-      client.config.partnerId, sequentialId, amount, currencyCode
-    ))
+      .post('/CreateGiftCard')
+      .reply(200, helpers.CreateGiftCardResponse(
+        client.config.partnerId, sequentialId, amount, currencyCode
+      ))
   }
-
 })

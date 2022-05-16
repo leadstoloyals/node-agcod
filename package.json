@@ -38,9 +38,9 @@
     "tape": "^4.11.0"
   },
   "dependencies": {
-    "aws4": "^1.8.0",
+    "aws4": "^1.11.0",
     "bignumber.js": "^9.0.0",
     "config": "^3.2.3",
-    "request": "^2.88.0"
+    "node-fetch": "^2.6.7"
   }
 }

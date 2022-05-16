@@ -3,11 +3,11 @@ const Client = require('../')
 const config = require('config')
 
 tape(`CC - Create and Cancel`, (t) => {
-  const client = new Client(config || {})
+  const client = new Client('./config/example.json')
   const amount = 1000
   const currencyCode = 'USD'
 
-  const { sequentialId } = client.createGiftCard('NA', amount, currencyCode, (error, result) => {
+  const { sequentialId } = client.createGiftCard('US', amount, (error, result) => {
     t.notOk(error, 'no error')
 
     t.equal(result.gcClaimCode.length > 0, true)
@@ -15,7 +15,7 @@ tape(`CC - Create and Cancel`, (t) => {
     t.equal(result.cardInfo.value.amount, amount)
     t.equal(result.cardInfo.cardStatus, 'Fulfilled')
     t.equal(result.gcId.length > 0, true)
-    t.equal(result.creationRequestId.slice(0,5), client.config.partnerId)
+    t.equal(result.creationRequestId.slice(0, 5), client.config.partnerId)
     t.equal(result.status, 'SUCCESS')
 
     console.log(`createGiftCard: ${JSON.stringify(result)} NOT PART OF RESPONSE TO AMAZON`)
@@ -38,7 +38,7 @@ tape(`DLB - Create request sanity check near discount's lower boundary - $0.01`,
   const amount = 0.01
   const currencyCode = 'USD'
 
-  client.createGiftCard('NA', amount, currencyCode, (error, result) => {
+  client.createGiftCard('US', amount, (error, result) => {
     t.notOk(error, 'no error')
 
     t.equal(result.gcClaimCode.length > 0, true)
@@ -46,7 +46,7 @@ tape(`DLB - Create request sanity check near discount's lower boundary - $0.01`,
     t.equal(result.cardInfo.value.amount, amount)
     t.equal(result.cardInfo.cardStatus, 'Fulfilled')
     t.equal(result.gcId.length > 0, true)
-    t.equal(result.creationRequestId.slice(0,5), client.config.partnerId)
+    t.equal(result.creationRequestId.slice(0, 5), client.config.partnerId)
     t.equal(result.status, 'SUCCESS')
 
     console.log(`createGiftCard: ${JSON.stringify(result)} NOT PART OF RESPONSE TO AMAZON`)
@@ -64,7 +64,7 @@ tape(`MAX - Create request for the maximum allowable GC - $2000.00`, (t) => {
   const amount = 2000
   const currencyCode = 'USD'
 
-  client.createGiftCard('NA', amount, currencyCode, (error, result) => {
+  client.createGiftCard('US', amount, (error, result) => {
     t.notOk(error, 'no error')
 
     t.equal(result.gcClaimCode.length > 0, true)
@@ -72,7 +72,7 @@ tape(`MAX - Create request for the maximum allowable GC - $2000.00`, (t) => {
     t.equal(result.cardInfo.value.amount, amount)
     t.equal(result.cardInfo.cardStatus, 'Fulfilled')
     t.equal(result.gcId.length > 0, true)
-    t.equal(result.creationRequestId.slice(0,5), client.config.partnerId)
+    t.equal(result.creationRequestId.slice(0, 5), client.config.partnerId)
     t.equal(result.status, 'SUCCESS')
 
     console.log(`createGiftCard: ${JSON.stringify(result)} NOT PART OF RESPONSE TO AMAZON`)
@@ -90,7 +90,7 @@ tape(`IDM - Create requests idempotency Check`, (t) => {
   const amount = 1000
   const currencyCode = 'USD'
 
-  const { sequentialId } = client.createGiftCard('NA', amount, currencyCode, (error, result) => {
+  const { sequentialId } = client.createGiftCard('US', amount, (error, result) => {
     t.notOk(error, 'no error')
 
     t.equal(result.gcClaimCode.length > 0, true)
@@ -98,7 +98,7 @@ tape(`IDM - Create requests idempotency Check`, (t) => {
     t.equal(result.cardInfo.value.amount, amount)
     t.equal(result.cardInfo.cardStatus, 'Fulfilled')
     t.equal(result.gcId.length > 0, true)
-    t.equal(result.creationRequestId.slice(0,5), client.config.partnerId)
+    t.equal(result.creationRequestId.slice(0, 5), client.config.partnerId)
     t.equal(result.status, 'SUCCESS')
 
     console.log(`createGiftCard: ${JSON.stringify(result)} NOT PART OF RESPONSE TO AMAZON`)
